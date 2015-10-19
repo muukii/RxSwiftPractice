@@ -24,7 +24,19 @@ class ViewController: UIViewController {
         }
         
         combine.bindTo(self.nameLabel.rx_text)
-        combine.bindTo(self.rx_name)        
+        
+        
+        self.firstNameTextField.rx_text.subscribeNext { value in
+            
+            print(value)
+        }
+                
+        self.firstNameTextField.rx_text.bindTo(self.rx_name)
+        
+        let scheduler = SerialDispatchQueueScheduler(globalConcurrentQueuePriority: DispatchQueueSchedulerPriority.Default)
+        
+        self.firstNameTextField.rx_text.observeOn(scheduler).bindTo(self.rx_name)
+        
     }
 
     @IBOutlet weak var firstNameTextField: UITextField!
