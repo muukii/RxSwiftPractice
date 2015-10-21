@@ -16,27 +16,27 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
 
-        self.firstNameTextField.rx_text.bindTo(self.firstNameLabel.rx_text)
-        self.lastNameTextField.rx_text.bindTo(self.lastNameLabel.rx_text)
+        self.firstNameTextField.rx_text.bindTo(self.firstNameLabel.rx_text).addDisposableTo(self.disposeBag)
+        self.lastNameTextField.rx_text.bindTo(self.lastNameLabel.rx_text).addDisposableTo(self.disposeBag)
         
         let combine = combineLatest(self.firstNameTextField.rx_text, self.lastNameTextField.rx_text) {
             return $0 + $1
         }
         
-        combine.bindTo(self.nameLabel.rx_text)
+        combine.bindTo(self.nameLabel.rx_text).addDisposableTo(self.disposeBag)
         
         
         self.firstNameTextField.rx_text.subscribeNext { value in
             
             print(value)
-        }
+        }.addDisposableTo(self.disposeBag)
                 
-        self.firstNameTextField.rx_text.bindTo(self.rx_name)
+        self.firstNameTextField.rx_text.bindTo(self.rx_name).addDisposableTo(self.disposeBag)
         
         let scheduler = SerialDispatchQueueScheduler(globalConcurrentQueuePriority: DispatchQueueSchedulerPriority.Default)
         
-        self.firstNameTextField.rx_text.observeOn(scheduler).bindTo(self.rx_name)
-        
+        self.firstNameTextField.rx_text.observeOn(scheduler).bindTo(self.rx_name).addDisposableTo(self.disposeBag)
+                
     }
 
     @IBOutlet weak var firstNameTextField: UITextField!
@@ -45,8 +45,10 @@ class ViewController: UIViewController {
     @IBOutlet weak var lastNameLabel: UILabel!
     @IBOutlet weak var nameLabel: UILabel!
     
-    private var rx_name: ObserverOf<String> {
-        return ObserverOf<String> { event in
+    let disposeBag = DisposeBag()
+    
+    private var rx_name: AnyObserver<String> {
+        return AnyObserver<String> { event in
             
             switch event {
             case .Next(let value):

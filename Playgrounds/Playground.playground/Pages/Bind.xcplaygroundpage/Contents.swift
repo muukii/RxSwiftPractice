@@ -6,8 +6,8 @@ import RxCocoa
 
 class View {
     
-    var rx_text: ObserverOf<String> {
-        return ObserverOf<String> { event in
+    var rx_text: AnyObserver<String> {
+        return AnyObserver<String> { event in
             
             // MainScheduler validation
             MainScheduler.ensureExecutingOnScheduler()

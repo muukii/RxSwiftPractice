@@ -17,3 +17,15 @@ b.value = 1
 c.value = 30
 
 //: [Next](@next)
+
+let aa: Observable<String> = create { observerOf in
+    
+    observerOf.onNext("aaa")
+    return AnonymousDisposable {
+        
+    }
+}
+
+aa.subscribeNext { event in
+    print(event)
+}

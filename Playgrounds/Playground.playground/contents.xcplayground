@@ -6,5 +6,6 @@
         <page name='Subject'/>
         <page name='Bind'/>
         <page name='Combined'/>
+        <page name='Promise'/>
     </pages>
 </playground>
