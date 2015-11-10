@@ -36,7 +36,8 @@ class ViewController: UIViewController {
         let scheduler = SerialDispatchQueueScheduler(globalConcurrentQueuePriority: DispatchQueueSchedulerPriority.Default)
         
         self.firstNameTextField.rx_text.observeOn(scheduler).bindTo(self.rx_name).addDisposableTo(self.disposeBag)
-                
+     
+        self.promiss()
     }
 
     @IBOutlet weak var firstNameTextField: UITextField!
@@ -59,6 +60,86 @@ class ViewController: UIViewController {
             case .Completed:
                 break
             }
+        }
+    }
+    
+    let value = Variable(1)
+    private func promiss() {
+        
+        value.map
+            { value in
+                
+                create { (observer: AnyObserver<Int>) in
+                    
+                    let delay = 1.0 * Double(NSEC_PER_SEC)
+                    let time  = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+                    dispatch_after(time, dispatch_get_main_queue(), {
+                        
+                        print("map:1 \(value) \(NSDate())")
+                        observer.onNext(value + 1)
+                        observer.onCompleted()
+                    })
+                    
+                    return NopDisposable.instance
+                }
+            }
+            .concat()
+            .map { value in
+                create { (observer: AnyObserver<Int>) in
+                    
+                    let delay = 1.0 * Double(NSEC_PER_SEC)
+                    let time  = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+                    dispatch_after(time, dispatch_get_main_queue()) {
+                        
+                        print("map:2 \(value) \(NSDate())")
+                        observer.onNext(value + 1)
+                        observer.onCompleted()
+                    }
+                    
+                    return NopDisposable.instance
+                }
+            }
+            .concat()
+            .subscribeNext { value in
+                
+                print("result \(value) \(NSDate())")
+            }.addDisposableTo(self.disposeBag)
+        
+        do {
+            let delay = 0.5 * Double(NSEC_PER_SEC)
+            let time  = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+            dispatch_after(time, dispatch_get_main_queue()) {
+                
+                self.value.value = 3
+            }
+        }
+        
+        do {
+            let delay = 1 * Double(NSEC_PER_SEC)
+            let time  = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+            dispatch_after(time, dispatch_get_main_queue()) {
+                
+                self.value.value = 3
+            }
+        }
+    }
+    
+    
+    func foo() {
+        
+        
+        let number = Variable(1)
+        
+        number.map
+            { number in
+            return number + 1
+            }
+            .map { number in
+                return number * 2
+            }
+            .subscribeNext { number in
+             
+                // number = 4
         }
     }
 }
