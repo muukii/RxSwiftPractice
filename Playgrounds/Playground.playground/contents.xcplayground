@@ -9,5 +9,6 @@
         <page name='Promise'/>
         <page name='PromiseErrorHandling'/>
         <page name='Leak'/>
+        <page name='Integration'/>
     </pages>
 </playground>
