@@ -38,6 +38,12 @@ class ViewController: UIViewController {
         self.firstNameTextField.rx_text.observeOn(scheduler).bindTo(self.rx_name).addDisposableTo(self.disposeBag)
      
         self.promiss()
+        
+        
+        self.rx_observeWeakly("")
+            .takeUntil(rx_deallocated)
+            .subscribeNext { (a: Bool?) -> Void in }
+            .addDisposableTo(self.disposeBag)
     }
 
     @IBOutlet weak var firstNameTextField: UITextField!
@@ -63,9 +69,13 @@ class ViewController: UIViewController {
         }
     }
     
+    enum SampleError: ErrorType {
+        case SomethingError
+    }
+    
     let value = Variable(1)
     private func promiss() {
-        
+            
         value.map
             { value in
                 
@@ -76,14 +86,15 @@ class ViewController: UIViewController {
                     dispatch_after(time, dispatch_get_main_queue(), {
                         
                         print("map:1 \(value) \(NSDate())")
-                        observer.onNext(value + 1)
+//                        observer.onNext(value + 1)
+                        observer.onError(SampleError.SomethingError)
                         observer.onCompleted()
                     })
                     
                     return NopDisposable.instance
-                }
+                }.catchErrorJustReturn(4)
             }
-            .concat()
+            .merge()
             .map { value in
                 create { (observer: AnyObserver<Int>) in
                     
@@ -99,7 +110,11 @@ class ViewController: UIViewController {
                     return NopDisposable.instance
                 }
             }
-            .concat()
+            .merge()
+            .catchError { error in
+                
+                just(0)
+            }
             .subscribeNext { value in
                 
                 print("result \(value) \(NSDate())")
@@ -119,7 +134,15 @@ class ViewController: UIViewController {
             let time  = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
             dispatch_after(time, dispatch_get_main_queue()) {
                 
-                self.value.value = 3
+                self.value.value = 4
+            }
+        }
+        do {
+            let delay = 1.2 * Double(NSEC_PER_SEC)
+            let time  = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+            dispatch_after(time, dispatch_get_main_queue()) {
+                
+                self.value.value = 4
             }
         }
     }
