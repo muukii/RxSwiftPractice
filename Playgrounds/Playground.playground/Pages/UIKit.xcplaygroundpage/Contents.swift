@@ -70,6 +70,7 @@ textFiled.rx_text
     .map { $0.characters.count }
     .filter { $0 > 3 }
     .take(2)
+    .ski
     .subscribeNext { count in
         
         // textFiled.textの値が変更されるたびに呼び出される

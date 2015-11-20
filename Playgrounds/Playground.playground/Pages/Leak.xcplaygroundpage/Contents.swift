@@ -55,8 +55,25 @@ func nonleak2() {
     
 }
 
-leak()
-nonleak1()
-nonleak2()
+func nonleak3() {
+    
+    let disposable = subject3.subscribe { event in
+       
+    }
+    
+    create { (observer: AnyObserver<Void>) in
+        
+        let myclass = MyClass()
+        myclass.name = "myclass3"
+        return NopDisposable.instance
+        }.subscribeNext {
+            
+    }
+}
+
+//leak()
+//nonleak1()
+//nonleak2()
+nonleak3()
 
 //: [Next](@next)
